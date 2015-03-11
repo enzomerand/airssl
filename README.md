@@ -1,9 +1,9 @@
 # Airssl 2.1 - Nyzo adaptation
-...
-# Installation
-## Configuration
-Work on Ubuntu 14.04 and less
-## Required packages
+*airssl.sh* creates a fake access point using Airbase-ng and uses sslstrip to bypass ssl encryption, it also offers the user the choice to use Driftnet to capture images. 
+## Installation
+### Configuration
+Work on Ubuntu 14.04 and less, **if you are not ethernet, you will need two wireless cards.**
+### Required packages
 Driftnet, Ettercap, DHCP, Aircrack and SSLStrip
 ```sh
 $ su root
@@ -11,8 +11,8 @@ $ apt-get update
 $ apt-get upgrade
 $ apt-get install driftnet ettercap-graphical isc-dhcp-server sslstrip aircrack-ng
 ```
-## Install
-Clone git repositery :
+### Install
+Clone git repository :
 ```sh
 $ cd /etc/
 $ clone git https://github.com/Enzo7337/airssl.git
@@ -36,5 +36,7 @@ Run script :
 $ ./airssl.sh
 ```
 Follow the instructions
-# Bug fixes
-...
+## Bug fixes
+*Contact me if you encounter any bugs so that I correct them.*
+
+La traduction en français arrive bientôt !
