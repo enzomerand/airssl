@@ -12,11 +12,11 @@ echo
 echo
 echo "Enter the networks gateway IP address, this should be listed above. For example 192.168.0.1: "
 read -e gatewayip
-echo -n "Enter your interface that is connected to the internet, this should be listed above. For example eth1: "
+echo -n "Enter your interface that is connected to the internet, this should be listed above. Generally eth0 or wlan0 if you not ethernet: "
 read -e internet_interface
-echo -n "Enter your interface to be used for the fake AP, for example wlan0: "
+echo -n "Enter your interface to be used for the fake AP, generally wlan0 or wlan1: "
 read -e fakeap_interface
-echo -n "Enter the ESSID you would like your rogue AP to be called: "
+echo -n "Enter the ESSID you would like your rogue AP to be called, for example FreeWifi: "
 read -e ESSID
 airmon-ng start $fakeap_interface
 fakeap=$fakeap_interface
