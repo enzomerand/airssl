@@ -41,16 +41,52 @@ Follow the instructions
 
 Sometimes upon rising DHCP server informs about permission errors like
 ```sh
-
+Can't open /etc/dhcp/dhcp.conf: permission denied
 ```
 or
 ```sh
-
+Can't open /var/lib/dhcp/dhcpd.leases: permission denied.
 ```
-
+or
 ```sh
-
+Can't open /pentest/wireless/airssl/dhcpd.conf: Permission denied
 ```
+
+If after checking the permissions are found to be correct, check **apparmor** profile for dhcpd:
+```sh
+$ sudo apparmor_status
+```
+
+If **/usr/sbin/dhcpd** is in the list of profiles do the following:
+1. Stop apparmor deamon
+```sh
+$ sudo /etc/init.d/apparmor stop
+```
+2. Edit /etc/apparmor.d/usr.sbin.dhcpd with root permissions :
+```sh
+$ nano /etc/apparmor.d/usr.sbin.dhcpd
+```
+3. And ensure that file has following lines:
+```sh
+/etc/dhcp/ r,
+  /etc/dhcp/** r,
+  /etc/dhcpd{,6}.conf r,
+  /etc/dhcpd{,6}_ldap.conf r,
+  /pentest/wireless/airssl/dhcpd{,6}.conf r,
+
+  /usr/sbin/dhcpd mr,
+
+  /var/lib/dhcp/dhcpd{,6}.leases* lrw,
+  /var/log/ r,
+  /var/log/** rw,
+  /{,var/}run/{,dhcp-server/}dhcpd{,6}.pid rw,
+```
+4. Start apparmor deamon
+```sh
+$ sudo /etc/init.d/apparmor start
+```
+
+After this operation apparmor deamon will allow dhcp server to open /etc/dhcp/dhcpd.conf or /var/lib/dhcp/dhcpd.leases files. For more information see **man apparmor**
 
 
 La traduction en français arrive bientôt !
