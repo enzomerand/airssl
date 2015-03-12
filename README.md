@@ -39,4 +39,18 @@ Follow the instructions
 ## Bug fixes
 *Contact me if you encounter any bugs so that I correct them.*
 
+Sometimes upon rising DHCP server informs about permission errors like
+```sh
+
+```
+or
+```sh
+
+```
+
+```sh
+
+```
+
+
 La traduction en français arrive bientôt !
