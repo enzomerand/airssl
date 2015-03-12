@@ -40,15 +40,15 @@ Follow the instructions
 *Contact me if you encounter any bugs so that I correct them.*
 
 Sometimes upon rising DHCP server informs about permission errors like
-```sh
+```
 Can't open /etc/dhcp/dhcp.conf: permission denied
 ```
 or
-```sh
+```
 Can't open /var/lib/dhcp/dhcpd.leases: permission denied.
 ```
 or
-```sh
+```
 Can't open /pentest/wireless/airssl/dhcpd.conf: Permission denied
 ```
 
