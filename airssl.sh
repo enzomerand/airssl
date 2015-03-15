@@ -15,6 +15,7 @@ echo "[+] Airbase-ng (fake ap) killed"
 pkill dhcpd
 echo "[+] DHCP killed"
 pkill sslstrip
+killall python
 echo "[+] SSLStrip killed"
 pkill ettercap
 echo "[+] Ettercap killed"
@@ -123,7 +124,7 @@ fi
 # Tables
 echo "[+] Configuring forwarding tables..."
 ifconfig lo up
-ifconfig at0 up
+ifconfig at0 up &
 sleep 1
 ifconfig at0 10.0.0.1 netmask 255.255.255.0
 ifconfig at0 mtu 1400
