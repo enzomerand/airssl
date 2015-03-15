@@ -1,7 +1,6 @@
 #!/bin/bash
-# (C)opyright 2009 - killadaninja - Modified G60Jon 2010
+# (C)opyright 2009 - killadaninja - Modified G60Jon 2010 - Updated Nyzo 2015
 # airssl.sh - v2.1-adapt
-# visit the man page NEW SCRIPT Capturing Passwords With sslstrip AIRSSL.sh
 
 if [ "$1" == "kill" ];then
 # Clean up if not pressed y
@@ -83,8 +82,7 @@ range 10.0.0.20 10.0.0.50;
 # Fake ap setup
 echo "[+] Configuring FakeAP...."
 echo
-echo "Airbase-ng will run in its most basic mode, would you like to
-configure any extra switches? "
+echo "Airbase-ng will run in its most basic mode, would you like to configure any extra switches? "
 echo
 echo "Choose Y to see airbase-ng help and add switches. "
 echo "Choose N to run airbase-ng in basic mode with your choosen ESSID. "
